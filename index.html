@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constellation Confession</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script> -->
+    <script src="https://kit.fontawesome.com/7600d9339a.js" crossorigin="anonymous"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: "Satisfy", serif;
+            background-color: #060313;
+            color: white;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #starCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #carouselMessage {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            display: none;
+            animation: fadeIn 1.7s ease-in-out;
+        }
+
+        #proceedButton {
+            position: absolute;
+            top: 85%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            background-color: #ff69b4;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            display: none;
+            cursor: pointer;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        #proceedButton:hover {
+            box-shadow: 1px 1px 20px pink;
+            cursor: pointer;
+            background-color: #ff4fa7;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Add fade-in effect for the book */
+        @keyframes fadeInBook {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Book */
+        .book {
+            position: relative;
+            left: 10%;
+            width: 350px;
+            height: 500px;
+            opacity: 0;
+            display: none;
+            animation: fadeInBook 2s ease-in-out forwards;
+            transition: transform 0.5s;
+            z-index: 25;
+        }
+
+        .paper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            /* border: 4px solid black; */
+            perspective: 1500px;
+
+        }
+
+        .front,
+        .back {
+            /* background-color: white; */
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            /* border: 4px solid rgb(253, 252, 252); */
+            border-radius: 15px;
+            transform-origin: left;
+            transition: transform 0.5s;
+        }
+
+        .cover {
+            background-color: #4A90E2;
+            border: 4px solid #34495E;
+            color: white;
+        }
+
+        .page {
+            background-color: #FDFEFE;
+            /* border: 4px solid #BDC3C7; */
+            border: 5px dashed #3498DB;
+            color: #2E4053;
+
+        }
+
+        .front {
+            z-index: 1;
+            backface-visibility: hidden;
+
+        }
+
+        .back {
+            z-index: 0;
+        }
+
+        .front-content,
+        .back-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .front-content h1,
+        .back-content h1 {
+            font-size: 20px;
+            /* text-shadow: 2px 2px 15px rgb(251, 249, 249); */
+            font-family: 'Cinzel', serif;
+            /* Ensure text is visible */
+            z-index: 10;
+            /* Make sure it sits on top */
+        }
+
+        .front-content p,
+        .back-content p {
+            font-size: 18px;
+            /* color: white; */
+            padding: 25px;
+
+            /* Ensure text is visible */
+            z-index: 10;
+
+            /* Make sure it sits on top */
+        }
+
+        .back-content {
+            transform: rotateY(180deg)
+        }
+
+        img {
+            width: 70%;
+            border: 4px double #1ABC9C;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            background-color: white;
+
+        }
+
+        /* Paper flip effect */
+        .flipped .front {
+            transform: rotateY(-180deg);
+        }
+
+        .flipped .back {
+            transform: rotateY(-180deg);
+
+        }
+
+        /* Controller Buttons */
+        .controlbtn {
+            position: relative;
+            visibility: hidden;
+            /* Initially hidden */
+            pointer-events: none;
+            /* Disable clicks initially */
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            margin: 10px;
+            z-index: 10;
+            transition: transform 0.5s, visibility 0.5s ease;
+        }
+
+        .controlbtn:focus {
+            outline: none;
+        }
+
+        .controlbtn:hover i {
+            color: #636363;
+        }
+
+        #prevBtn,
+        #nextBtn {
+            /* position: absolute; */
+            top: 50%;
+
+            /* Center vertically */
+            transform: translateY(-50%);
+            z-index: 10;
+            /* Ensure it's on top of the book */
+            pointer-events: auto;
+            /* Ensure they are clickable */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Optional: styling */
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        /* Updated control buttons for extreme left and right positions */
+        #prev-btn {
+            position: fixed;
+            left: 0;
+        }
+
+        #next-btn {
+            position: fixed;
+            right: 0;
+        }
+
+
+        i {
+            font-size: 50px;
+            color: gray;
+        }
+
+        /* Paper stack order */
+        #p1 {
+            z-index: 14;
+        }
+
+        #p2 {
+            z-index: 13;
+        }
+
+        #p3 {
+            z-index: 12;
+        }
+
+        #p4 {
+            z-index: 11;
+        }
+
+        #p5 {
+            z-index: 10;
+        }
+
+        #p6 {
+            z-index: 9;
+        }
+
+        #p7 {
+            z-index: 8;
+        }
+
+        #p8 {
+            z-index: 7;
+        }
+
+        #p9 {
+            z-index: 6;
+        }
+
+        #p10 {
+            z-index: 5;
+        }
+
+        #p11 {
+            z-index: 4;
+        }
+
+        #p12 {
+            z-index: 3;
+        }
+
+        #p13 {
+            z-index: 2;
+        }
+
+        #p14 {
+            z-index: 1;
+        }
+    </style>
+    </style>
+</head>
+
+<body>
+    <canvas id="starCanvas"></canvas>
+    <div id="carouselMessage"></div>
+    <audio id="backgroundMusic" src="./audios/finalaudio.mp3" loop preload="auto"></audio>
+    <button id="proceedButton">See What's Next</button>
+    <!-- Previous Button -->
+    <button class="controlbtn" id="prev-btn">
+        <i class="fas fa-arrow-circle-left"></i>
+    </button>
+
+
+    <!-- Book -->
+    <div id="book" class="book">
+        <!-- Paper 1 -->
+        <div id="p1" class="paper">
+            <div class="front cover">
+                <div id="f1" class="front-content">
+                    <h1>A Journey Through My Heart</h1>
+                    <img src="./images/cover.jpg" alt="Cover">
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b1" class="back-content">
+                    <!-- <h1>Back 1</h1> -->
+                    <img src="./images/5.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 2 -->
+        <div id="p2" class="paper">
+            <div class="front page">
+                <div id="f2" class="front-content">
+                    <p>I’ve been searching for the right words to express what has been in my heart for so long. You
+                        deserve honesty, and I feel it’s time to share my deepest feelings with you. From the moment we
+                        started talking, everything felt simple and natural. But as time went by, I realized something
+                        extraordinary—I was falling for you.</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b2" class="back-content">
+                    <!-- <h1>Back 2</h1> -->
+                    <img src="./images/sunset.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 3 -->
+        <div id="p3" class="paper">
+            <div class="front page">
+                <div id="f3" class="front-content">
+                    <p>You’ve captivated me, not for your looks alone, nor for the shadows of your past that you might
+                        carry,<br>
+                        But for the person you truly are—<br>
+                        A soul so kind, so generous, so bold.</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b3" class="back-content">
+                    <img src="./images/cover1.jpeg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 4 -->
+        <div id="p4" class="paper">
+            <div class="front page">
+                <div id="f4" class="front-content">
+                    <h1>5th December 2024,</h1>
+                    <p>That day felt incredibly special to me. After our project meeting, the time we spent together
+                        became a memory I deeply cherish. I don’t know why, but I feel so nervous around you—my heart
+                        races, and I often fumble over my words.
+                        When you handed me that pink bougainvillea flower ❤️, it became more than just a flower—it held
+                        a special place in my heart. I came home that day replaying every moment we spent together,
+                        smiling at the thought of you.
+                        That flower you gave me? I’ve preserved it. It’s a reminder of a day I’ll never forget.</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b4" class="back-content">
+                    <img src="./images/3.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 5 -->
+        <div id="p5" class="paper">
+            <div class="front page">
+                <div id="f5" class="front-content">
+                    <p>As much as I wanted to share my feelings with you earlier, I held myself back. I knew you were
+                        preparing for the Capgemini placement, and I didn’t want to distract you or put you in a
+                        position where this could weigh on your mind. Supporting you during that time meant stepping
+                        aside, cheering you on silently, and letting you shine in your journey.</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b5" class="back-content">
+                    <img src="./images/1.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 6 -->
+        <div id="p6" class="paper">
+            <div class="front page">
+                <div id="f6" class="front-content">
+                    <p>During that time, you became my strength in ways you might not even realize. Even though we were
+                        walking different paths, you were always in my thoughts. The idea of seeing you smile gave me
+                        the courage to push through my own challenges. When I was preparing for the Accenture placement
+                        drive, I gave it everything I had because the thought of failing, of not being good enough, was
+                        unbearable. You became my anchor and my motivation—the reason I wanted to succeed.</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b6" class="back-content">
+                    <img src="./images/flower.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 7 -->
+        <div id="p7" class="paper">
+            <div class="front page">
+                <div id="f7" class="front-content">
+                    <p>
+                        Still, I’ve hesitated to tell you how I feel. Not because I doubted my emotions but because I
+                        know the fears you carry. I know what it’s like to question whether love is worth the risk, to
+                        feel as though it might reopen old wounds. But as someone who has walked a similar path, I want
+                        to tell you that love doesn’t erase those scars—it gives them meaning.
+                    </p>
+
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b7" class="back-content">
+                    <img src="./images/sight.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 8 -->
+        <div id="p8" class="paper">
+            <div class="front page">
+                <div id="f8" class="front-content">
+                    <p>In this accursed world of selfish hearts,<br>
+                        You melt away darkness, curse by curse.<br>
+                        Your light shines through, a luminous blaze,<br>
+                        A mesmerizing beauty, endless and unexplored. <br>
+                        I know love hasn’t been easy for you—it hasn’t been for me either. From what you’ve shared, it’s
+                        clear you’ve been through something profound, something that may have left scars. I don’t want
+                        to deny or ignore that. Instead, I want to acknowledge it and let you know that I see you for
+                        all that you are, past and present. <br>
+
+                        Like wounded soldiers on a battlefield,<br>
+                        I fight with courage, though fragile, yet unseen.<br>
+                        How can I tell you of my secret love—<br>
+                        A love so pure and deep, so quiet and keen?</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b8" class="back-content">
+                    <img src="./images/peace1.png" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 9 -->
+        <div id="p9" class="paper">
+            <div class="front page">
+                <div id="f9" class="front-content">
+                    <p>Soumili, you’ve inspired me in ways I never thought possible. You’ve taught me the value of
+                        patience, resilience, and kindness. I don’t expect us to be perfect, and I don’t want to rush
+                        you into something you’re not ready for. But I do want you to know that my feelings for you come
+                        from a place of respect, admiration, and genuine care.</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b9" class="back-content">
+                    <img src="./images/couple-6274872_1280.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 10 -->
+        <div id="p10" class="paper">
+            <div class="front page">
+                <div id="f10" class="front-content">
+                    <p>If I confess the dark mirage of my afflicted past,<br>
+                        Would you still choose to stay,<br>
+                        Holding me close to your heart,<br>
+                        Binding me in your embrace?<br>
+                        Because I know I’m not perfect. I carry my own flaws, fears, and scars.<br>
+                        If I confess to you about my chasms and blemishes,<br>
+                        Would you still see the beauty that I hold inside?</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b10" class="back-content">
+                    <img src="./images/4.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 11 -->
+        <div id="p11" class="paper">
+            <div class="front page">
+                <div id="f11" class="front-content">
+                    <p>I believe that love, at its best, is about walking through life’s storms together. It’s not about
+                        perfection but about holding on through light and rain, joy and pain.
+                    </p>
+                    <p>When my soul feels splintered and my spirit entangled,<br>
+                        Would you still see the best in me?<br>
+                        So tell me now, through light and rain,<br>
+                        Will you still be mine, through joy and pain?</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b11" class="back-content">
+                    <img src="./images/6.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 12 -->
+        <div id="p12" class="paper">
+            <div class="front page">
+                <div id="f12" class="front-content">
+                    <p>I won’t ever force you to love me back or go against your will. I just needed to share how I feel
+                        about you and how, without even realizing it, I’ve fallen deeply in love with you.
+                    </p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b112" class="back-content">
+                    <img src="./images/p2.jpg" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 13 -->
+        <div id="p13" class="paper">
+            <div class="front page">
+                <div id="f13" class="front-content">
+                    <p>I cherish every side of you, even the moments when you feel messy or imperfect. None of that
+                        matters to me. What truly matters is you—the genuine, real, and beautiful you.</p>
+                </div>
+            </div>
+            <div class="back page">
+                <div id="b13" class="back-content">
+                    <img src="./images/2.png" alt="#">
+                </div>
+            </div>
+        </div>
+        <!-- Paper 14 -->
+        <div id="p14" class="paper">
+            <div class="front page">
+                <div id="f14" class="front-content">
+                    <p> If there’s even a part of you that feels the same, I’d love nothing more than to explore this
+                        together. But if not, please know that my feelings will remain genuine and unwavering, and I
+                        will always respect and support you no matter what.<br><br>With all my heart,<br>
+                        Samarpan.❤️</p>
+                </div>
+            </div>
+            <!-- <div class="back page">
+                <div id="b6" class="back-content">
+                    <img src="./images/cover1.jpeg" alt="#">
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+    <!-- Next Button -->
+    <button class="controlbtn" id="next-btn">
+        <i class="fas fa-arrow-circle-right"></i>
+    </button>
+
+
+    <script>
+        const canvas = document.getElementById("starCanvas");
+        const ctx = canvas.getContext("2d");
+        const carouselMessage = document.getElementById("carouselMessage");
+        const proceedButton = document.getElementById("proceedButton");
+        const backgroundMusic = document.getElementById("backgroundMusic");
+        const intenseMusic = document.getElementById("intenseMusic");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const prevBtn = document.querySelector("#prev-btn");
+        const nextBtn = document.querySelector("#next-btn");
+        const book = document.querySelector("#book");
+
+        const paper1 = document.querySelector("#p1");
+        const paper2 = document.querySelector("#p2");
+        const paper3 = document.querySelector("#p3");
+        const paper4 = document.querySelector("#p4");
+        const paper5 = document.querySelector("#p5");
+        const paper6 = document.querySelector("#p6");
+        const paper7 = document.querySelector("#p7");
+        const paper8 = document.querySelector("#p8");
+        const paper9 = document.querySelector("#p9");
+        const paper10 = document.querySelector("#p10");
+        const paper11 = document.querySelector("#p11");
+        const paper12 = document.querySelector("#p12");
+        const paper13 = document.querySelector("#p13");
+        const paper14 = document.querySelector("#p14");
+
+        // Event Listener
+        // Prevent clicks when buttons are not visible
+        prevBtn.addEventListener("click", () => {
+            if (prevBtn.style.visibility === "visible") {
+                goPrevPage();
+            } else {
+                console.log("Prev button is not visible yet.");
+            }
+        });
+
+        nextBtn.addEventListener("click", () => {
+            if (nextBtn.style.visibility === "visible") {
+                goNextPage();
+            } else {
+                console.log("Next button is not visible yet.");
+            }
+        });
+
+        document.body.addEventListener('click', () => {
+            backgroundMusic.play().then(() => {
+                console.log("Background music is playing.");
+            }).catch((error) => {
+                console.error("Autoplay prevented, waiting for user interaction:", error);
+            });
+            document.body.removeEventListener('click', arguments.callee);
+        });
+
+
+        const stars = [];
+        const starMessages = [
+            "Soumili, you make my heart shimmer like the brightest star in the night sky.",
+            "Every moment I spend near you feels like a dream woven with stardust.",
+            "Your smile isn’t just beautiful—it’s the light that guides me through my darkest days.",
+            "When I think of us, I see a constellation—a unique pattern only we could ever create.",
+            "There’s something incredibly special I’ve been holding onto", "something I want to share with you",
+            "because you’re the reason my world feels so extraordinary❤️."
+        ];
+        const clickedStars = [];
+        const heartShape = [];
+        const scale = 7; // Adjust this to scale the heart
+
+        // Generate points for the heart shape using the parametric equation
+        for (let t = 0; t <= Math.PI * 2; t += 0.1) {
+            const x = canvas.width / 2 + scale * 16 * Math.pow(Math.sin(t), 3);
+            const y =
+                canvas.height / 2 -
+                scale *
+                (13 * Math.cos(t) -
+                    5 * Math.cos(2 * t) -
+                    2 * Math.cos(3 * t) -
+                    Math.cos(4 * t));
+            heartShape.push({ x, y });
+        }
+
+        let fadeOpacity = 0;
+
+        for (let i = 0; i < 50; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                color: `rgba(${Math.random() * 255}, ${Math.random() * 200}, ${Math.random() * 255}, 0.8)`,
+                clicked: false
+            });
+        }
+        // Update stars with velocity and shadowBlur properties
+        for (let i = 0; i < 50; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                color: `rgba(${Math.random() * 255}, ${Math.random() * 200}, ${Math.random() * 255}, 0.8)`,
+                velocityX: (Math.random() - 0.05) * 0.05, // Small horizontal movement
+                velocityY: (Math.random() - 0.05) * 0.05, // Small vertical movement
+                shadowBlur: Math.random() * 25 + 5, // Blur intensity
+                clicked: false
+            });
+        }
+
+        function drawStarsMotion() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach((star) => {
+                // Update star position
+                star.x += star.velocityX;
+                star.y += star.velocityY;
+
+                // Wrap stars around canvas edges
+                if (star.x < 0) star.x = canvas.width;
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y < 0) star.y = canvas.height;
+                if (star.y > canvas.height) star.y = 0;
+
+                // Draw star with shadow (bloom effect)
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.shadowBlur = star.shadowBlur;
+                ctx.shadowColor = star.color;
+                ctx.fillStyle = star.color;
+                ctx.fill();
+            });
+
+            if (clickedStars.length > 1) {
+                // Draw the connecting lines between clicked stars
+                ctx.strokeStyle = "rgba(255, 192, 203, 0.7)";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(clickedStars[0].x, clickedStars[0].y);
+                clickedStars.forEach((point) => {
+                    ctx.lineTo(point.x, point.y);
+                });
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(drawStarsMotion);
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach((star) => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = star.clicked ? "white" : star.color;
+                ctx.fill();
+            });
+
+            if (clickedStars.length > 1) {
+                ctx.strokeStyle = "rgba(255, 192, 203, 0.7)";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(clickedStars[0].x, clickedStars[0].y);
+                clickedStars.forEach((point) => {
+                    ctx.lineTo(point.x, point.y);
+                });
+                ctx.stroke();
+            }
+            requestAnimationFrame(drawStars);
+        }
+        drawStars();
+        function drawHeart() {
+            drawStarsMotion();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach((star) => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = star.color;
+                ctx.fill();
+            });
+
+            ctx.globalAlpha = fadeOpacity;
+            // ctx.strokeStyle = "rgba(255, 20, 147, 1)";
+            ctx.strokeStyle = "rgba(255, 20, 147, 1)"; // Outline color
+            ctx.fillStyle = "rgba(255, 105, 180, 0.8)"; // Fill color
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            heartShape.forEach((point, index) => {
+                if (index === 0) {
+                    ctx.moveTo(point.x, point.y);
+                } else {
+                    ctx.lineTo(point.x, point.y);
+                }
+            });
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fill(); // Fill the heart shape
+
+            fadeOpacity += 0.001;
+            if (fadeOpacity <= 5) {
+                proceedButton.style.display = "block";
+                requestAnimationFrame(drawHeart);
+            }
+        }
+        proceedButton.addEventListener("click", () => {
+            // alert("button clicked");
+            // Hide the "See What's Next" button
+            proceedButton.style.display = "none";
+
+            book.style.display = "block"; // Make the book visible
+            setTimeout(() => {
+                book.style.opacity = "1"; // Trigger the fade-in effect
+            }, 2000); // Delay to ensure CSS transition is applied
+            // Show the navigation buttons with visibility
+            prevBtn.style.visibility = "visible";
+            nextBtn.style.visibility = "visible";
+
+            // Enable interaction with buttons
+            prevBtn.style.pointerEvents = "auto";
+            nextBtn.style.pointerEvents = "auto";
+
+        });
+        canvas.addEventListener("click", (e) => {
+            const clickX = e.clientX;
+            const clickY = e.clientY;
+
+            stars.forEach((star) => {
+                const distance = Math.hypot(star.x - clickX, star.y - clickY);
+                if (distance < star.size + 10 && !star.clicked) {
+                    star.clicked = true;
+                    clickedStars.push(star);
+
+                    if (clickedStars.length <= starMessages.length) {
+                        carouselMessage.style.display = "block";
+                        carouselMessage.textContent = starMessages[clickedStars.length - 1];
+                        setTimeout(() => {
+                            carouselMessage.style.display = "none";
+                        }, 6000);
+                    }
+
+                    if (clickedStars.length === starMessages.length) {
+                        drawHeart();
+                    }
+                }
+            });
+        });
+        // Book Logic
+        let currentLocation = 1;
+        let numOfPapers = 14;
+        let maxLocation = numOfPapers + 1;
+
+        function openBook() {
+            book.style.transform = "translateX(60%)";
+        }
+
+
+        function closeBook(isAtBeginning) {
+            if (isAtBeginning) {
+                // Move the book to the initial position
+                book.style.transform = "translateX(0%)";
+            } else {
+                // Move the book to its closing position
+                book.style.transform = "translateX(100%)";
+            }
+        }
+
+
+        function goNextPage() {
+            if (currentLocation < maxLocation - 1) {
+                switch (currentLocation) {
+                    case 1:
+                        openBook();
+                        paper1.classList.add("flipped");
+                        paper1.style.zIndex = 1;
+                        break;
+                    case 2:
+                        paper2.classList.add("flipped");
+                        paper2.style.zIndex = 2;
+                        break;
+                    case 3:
+                        paper3.classList.add("flipped");
+                        paper3.style.zIndex = 3;
+                        closeBook(false);
+                        break;
+                    case 4:
+                        paper4.classList.add("flipped");
+                        paper4.style.zIndex = 4;
+                        closeBook(false);
+                        break;
+                    case 5:
+                        paper5.classList.add("flipped");
+                        paper5.style.zIndex = 5;
+                        closeBook(false);
+                        break;
+                    case 6:
+                        paper6.classList.add("flipped");
+                        paper6.style.zIndex = 6;
+                        closeBook(false);
+                        break;
+                    case 7:
+                        openBook();
+                        paper7.classList.add("flipped");
+                        paper7.style.zIndex = 7;
+                        break;
+                    case 8:
+                        paper8.classList.add("flipped");
+                        paper8.style.zIndex = 8;
+                        break;
+                    case 9:
+                        paper9.classList.add("flipped");
+                        paper9.style.zIndex = 9;
+                        closeBook(false);
+                        break;
+                    case 10:
+                        paper10.classList.add("flipped");
+                        paper10.style.zIndex = 10;
+                        closeBook(false);
+                        break;
+                    case 11:
+                        paper11.classList.add("flipped");
+                        paper11.style.zIndex = 11;
+                        closeBook(false);
+                        break;
+                    case 12:
+                        paper12.classList.add("flipped");
+                        paper12.style.zIndex = 12;
+                        closeBook(false);
+                        break;
+                    case 13:
+                        paper13.classList.add("flipped");
+                        paper13.style.zIndex = 13;
+                        closeBook(false);
+                        break;
+                    case 14:
+                        paper14.classList.add("flipped");
+                        paper14.style.zIndex = 14;
+                        closeBook(false);
+                        break;
+
+                    default:
+                        throw new Error("unkown state");
+                }
+                currentLocation++;
+            }
+        }
+
+        function goPrevPage() {
+            if (currentLocation > 1) {
+                switch (currentLocation) {
+                    case 2:
+                        closeBook(true);
+                        paper1.classList.remove("flipped");
+                        paper1.style.zIndex = 14;
+                        break;
+                    case 3:
+                        paper2.classList.remove("flipped");
+                        paper2.style.zIndex = 13;
+                        break;
+                    case 4:
+                        openBook();
+                        paper3.classList.remove("flipped");
+                        paper3.style.zIndex = 12;
+                        break;
+                    case 5:
+                        openBook();
+                        paper4.classList.remove("flipped");
+                        paper4.style.zIndex = 11;
+                        break;
+                    case 6:
+                        openBook();
+                        paper5.classList.remove("flipped");
+                        paper5.style.zIndex = 10;
+                        break;
+                    case 7:
+                        openBook();
+                        paper6.classList.remove("flipped");
+                        paper6.style.zIndex = 9;
+                        break;
+                    case 8:
+                        closeBook(true);
+                        paper7.classList.remove("flipped");
+                        paper7.style.zIndex = 8;
+                        break;
+                    case 9:
+                        paper8.classList.remove("flipped");
+                        paper8.style.zIndex = 7;
+                        break;
+                    case 10:
+                        openBook();
+                        paper9.classList.remove("flipped");
+                        paper9.style.zIndex = 6;
+                        break;
+                    case 11:
+                        openBook();
+                        paper10.classList.remove("flipped");
+                        paper10.style.zIndex = 5;
+                        break;
+                    case 12:
+                        openBook();
+                        paper11.classList.remove("flipped");
+                        paper11.style.zIndex = 4;
+                        break;
+                    case 13:
+                        openBook();
+                        paper12.classList.remove("flipped");
+                        paper12.style.zIndex = 3;
+                        break;
+                    case 14:
+                        openBook();
+                        paper13.classList.remove("flipped");
+                        paper13.style.zIndex = 2;
+                        break;
+                    case 15:
+                        openBook();
+                        paper14.classList.remove("flipped");
+                        paper14.style.zIndex = 1;
+                        break;
+                    default:
+                        throw new Error("unkown state");
+                }
+
+                currentLocation--;
+            }
+        }
+    </script>
+</body>
+
+</html>
